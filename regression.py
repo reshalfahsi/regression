@@ -118,25 +118,19 @@ def polynomial_regression(x, y, degree=3):
 def linear_regression(x, y):
     x_mean = np.mean(x)
     y_mean = np.mean(y)
-    n = len(x)
-    num = 0
-    den = 0
-    for i in range(n):
-        num += (x[i] - x_mean) * (y[i] - y_mean)
-        den += (x[i] - x_mean) ** 2
 
-    b1 = num/den
-    b0 = y_mean - (b1 * x_mean)
+    num = sum((x_i - x_mean)*(y_i - y_mean) for (x_i, y_i) in zip(x, y))
+    den = sum((x_i - x_mean)**2 for x_i in x)
 
-    print('Linear Regression: y = mx +b')
-    print('m: ', b1)
-    print('b: ', b0)
+    m = num/den
+    c = y_mean - (m * x_mean)
 
-    x_max = np.max(x)
-    x_min = np.min(x)
+    print('Linear Regression: y = mx + c')
+    print('m: ', m)
+    print('c: ', c)
 
-    x = np.linspace(x_min, x_max, 100)
-    y = b0 + b1 * x
+    x = np.linspace(np.min(x), np.max(x), 100)
+    y = c + m * x
     return x, y
 
 def read_csv(filename):
