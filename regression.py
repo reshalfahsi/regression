@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
-import sys
-
+import argparse
 
 available_regression = [
     'power_regression',
@@ -167,7 +166,8 @@ def regression(types):
     plt.show()
 
 if __name__=='__main__':
-    types = 'linear_regression'
-    if(len(sys.argv)>1):
-        types = str(sys.argv[1]) 
-    regression(types)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('type', nargs='?', default='linear_regression', 
+        help='regression type to be executed')
+    args = parser.parse_args()
+    regression(args.type)
