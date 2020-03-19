@@ -5,8 +5,16 @@ import sys
 import math
 from collections import OrderedDict
 
+
+available_regression = [
+    'power_regression',
+    'exponential_regression',
+    'polynomial_regression',
+    'linear_regression'
+]
+
+
 def power_regression(x, y):
-    
     n = len(x)
     term1 = 0
     term2 = 0
@@ -65,7 +73,7 @@ def exponential_regression(x, y):
 
     return x, y
 
-def polynomial_regression(x, y, degree):
+def polynomial_regression(x, y, degree=3):
     x_mean = np.mean(x)
     x_max =  np.max(x)
     x_min = np.min(x)
@@ -142,44 +150,23 @@ def regression(types):
     data = read_csv('dataset.csv')
     x, y = data['x'], data['y']
 
-    if(types=='linear_regression'):
-        x_lr, y_lr = linear_regression(x, y)
-        plt.plot(x_lr, y_lr, color='#a7de77', label='Linear Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Linear Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='polynomial_regression'):
-        x_poly, y_poly = polynomial_regression(x, y, 3)
-        plt.plot(x_poly, y_poly, color='#a7de77', label='Polynomial Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Polynomial Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='power_regression'):
-        x_pow, y_pow = power_regression(x, y)
-        plt.plot(x_pow, y_pow, color='#a7de77', label='Power Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Power Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='exponential_regression'):
-        x_exp, y_exp = exponential_regression(x, y)
-        plt.plot(x_exp, y_exp, color='#a7de77', label='Exponential Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Exponential Regression')
-        plt.legend()
-        plt.show()
-    else:
-        print('Invalid Type of Regression!!')
+    if types not in available_regression:
+        raise RuntimeError("Invalid Regression Type of '%s', available: %s" % (types, 
+                           ", ".join(available_regression)))
+    kwargs = {}
+    if types == 'polynomial_regression':
+        kwargs['degree'] = 3
+    
+    x_reg, y_reg = eval(f"{types}(x, y, **kwargs)")
+    
+    label = ' '.join(word.capitalize() for word in types.replace('_', ' ').split())
+    plt.plot(x_reg, y_reg, color='#a7de77', label=label)
+    plt.scatter(x, y, color='#9b354c', label='Data Point')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(label)
+    plt.legend()
+    plt.show()
 
 if __name__=='__main__':
     types = 'linear_regression'
