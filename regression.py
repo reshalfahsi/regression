@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
+import csv
 import sys
-from collections import OrderedDict
 import math
+from collections import OrderedDict
 
 def power_regression(x, y):
     
@@ -131,10 +131,16 @@ def linear_regression(x, y):
     y = b0 + b1 * x
     return x, y
 
+def read_csv(filename):
+    with open('dataset.csv') as f:
+        reader = csv.reader(f, skipinitialspace=True, delimiter=',')
+        data = [row for row in reader]
+        data = {k: v for k, v in zip(data[0], np.array(data[1:], dtype=np.float).T)}
+    return data
+
 def regression(types):
-    dataset = pd.read_csv('dataset.csv')
-    x = dataset['x'].values
-    y = dataset['y'].values
+    data = read_csv('dataset.csv')
+    x, y = data['x'], data['y']
 
     if(types=='linear_regression'):
         x_lr, y_lr = linear_regression(x, y)
