@@ -40,7 +40,7 @@ def power_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a*(x**b)
 
-    return x, y
+    return x, y, "y = ({:.4f} * x)^({:.4f})".format(a, b)
 
 def exponential_regression(x, y):
     x_mean = np.mean(x)
@@ -71,7 +71,7 @@ def exponential_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a * np.exp(b*x)
 
-    return x, y
+    return x, y, "y = {:.4f} * (e^({:.4f} * x))".format(a, b)
 
 def polynomial_regression(x, y, degree=3):
     x_mean = np.mean(x)
@@ -107,13 +107,18 @@ def polynomial_regression(x, y, degree=3):
 
     x = np.linspace(x_min, x_max, 100)
     y = theta[0]
+    txt = "y = {:.4f}".format(theta[0])
 
     print('Polynomial Regression: a0 + a1.X + ... + an.X^n') 
     for n in np.arange(1, len(theta)):
         print('a'+ str(n),': ',theta[n])
+        txt += " + {:.4f}*x".format(theta[n]) if theta[n] >= 0 else \
+            " - {:.4f}*x".format(-theta[n])
+        if n > 1:
+            txt += "^%s" % str(n)
         y += theta[n] * (x ** (n))
 
-    return x, y
+    return x, y, txt
 
 def linear_regression(x, y):
     x_mean = np.mean(x)
@@ -131,7 +136,7 @@ def linear_regression(x, y):
 
     x = np.linspace(np.min(x), np.max(x), 100)
     y = c + m * x
-    return x, y
+    return x, y, "y = ({:.4f})*x + ({:.4f})".format(m, c)
 
 def read_csv(filename):
     with open('dataset.csv') as f:
@@ -151,7 +156,7 @@ def regression(types):
     if types == 'polynomial_regression':
         kwargs['degree'] = 3
     
-    x_reg, y_reg = eval(f"{types}(x, y, **kwargs)")
+    x_reg, y_reg, text = eval(f"{types}(x, y, **kwargs)")
     
     label = ' '.join(word.capitalize() for word in types.replace('_', ' ').split())
     plt.plot(x_reg, y_reg, color='#a7de77', label=label)
@@ -160,6 +165,11 @@ def regression(types):
     plt.ylabel('Y')
     plt.title(label)
     plt.legend()
+    x_lim = plt.gca().get_xlim()
+    y_lim = plt.gca().get_ylim()
+    x_text = x_lim[0] + ((x_lim[1] - x_lim[0])/64)
+    y_text = y_lim[1] - ((y_lim[1] - y_lim[0])/5)
+    plt.text(x_text, y_text, text)
     plt.show()
 
 if __name__=='__main__':
