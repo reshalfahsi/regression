@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import sys
-import math
-from collections import OrderedDict
 
 
 available_regression = [
@@ -74,15 +72,10 @@ def exponential_regression(x, y):
     return x, y, "y = {:.4f} * (e^({:.4f} * x))".format(a, b)
 
 def polynomial_regression(x, y, degree=3):
-    x_mean = np.mean(x)
-    x_max =  np.max(x)
-    x_min = np.min(x)
-    d = {}
-    d['x' + str(0)] = np.ones([1,len(x)])[0]
-    for n in np.arange(1, degree+1):
-        d['x' + str(n)] = ((x**n) - np.mean(x**n))/(np.max(x**n) - np.min(x**n))
-    d = OrderedDict(sorted(d.items(), key=lambda t: t[0]))
-    X = np.column_stack(d.values())
+    X = np.ones((len(x), degree+1))
+    for n in range(1, degree+1):
+        val = ((x**n) - np.mean(x**n))/(np.max(x**n) - np.min(x**n))
+        X[:, n] = val
 
     m = len(x)
     theta = np.zeros(degree+1)
@@ -105,13 +98,14 @@ def polynomial_regression(x, y, degree=3):
             theta += (-0.001) * (1/m) * np.dot(error, X)
             break
 
-    x = np.linspace(x_min, x_max, 100)
+    x = np.linspace(np.min(x), np.max(x), 100)
     y = theta[0]
     txt = "y = {:.4f}".format(theta[0])
 
     print('Polynomial Regression: a0 + a1.X + ... + an.X^n') 
+    print("a0: %s" % theta[0])
     for n in np.arange(1, len(theta)):
-        print('a'+ str(n),': ',theta[n])
+        print('a%s: %s' % (n, theta[n]))
         txt += " + {:.4f}*x".format(theta[n]) if theta[n] >= 0 else \
             " - {:.4f}*x".format(-theta[n])
         if n > 1:
