@@ -1,12 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-import sys
-from collections import OrderedDict
-import math
+import csv
+import argparse
+
+available_regression = [
+    'power_regression',
+    'exponential_regression',
+    'polynomial_regression',
+    'linear_regression'
+]
+
 
 def power_regression(x, y):
-    
     n = len(x)
     term1 = 0
     term2 = 0
@@ -32,7 +37,7 @@ def power_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a*(x**b)
 
-    return x, y
+    return x, y, "y = ({:.4f} * x)^({:.4f})".format(a, b)
 
 def exponential_regression(x, y):
     x_mean = np.mean(x)
@@ -63,18 +68,13 @@ def exponential_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a * np.exp(b*x)
 
-    return x, y
+    return x, y, "y = {:.4f} * (e^({:.4f} * x))".format(a, b)
 
-def polynomial_regression(x, y, degree):
-    x_mean = np.mean(x)
-    x_max =  np.max(x)
-    x_min = np.min(x)
-    d = {}
-    d['x' + str(0)] = np.ones([1,len(x)])[0]
-    for n in np.arange(1, degree+1):
-        d['x' + str(n)] = ((x**n) - np.mean(x**n))/(np.max(x**n) - np.min(x**n))
-    d = OrderedDict(sorted(d.items(), key=lambda t: t[0]))
-    X = np.column_stack(d.values())
+def polynomial_regression(x, y, degree=3):
+    X = np.ones((len(x), degree+1))
+    for n in range(1, degree+1):
+        val = ((x**n) - np.mean(x**n))/(np.max(x**n) - np.min(x**n))
+        X[:, n] = val
 
     m = len(x)
     theta = np.zeros(degree+1)
@@ -97,86 +97,77 @@ def polynomial_regression(x, y, degree):
             theta += (-0.001) * (1/m) * np.dot(error, X)
             break
 
-    x = np.linspace(x_min, x_max, 100)
+    x = np.linspace(np.min(x), np.max(x), 100)
     y = theta[0]
+    txt = "y = {:.4f}".format(theta[0])
 
     print('Polynomial Regression: a0 + a1.X + ... + an.X^n') 
+    print("a0: %s" % theta[0])
     for n in np.arange(1, len(theta)):
-        print('a'+ str(n),': ',theta[n])
+        print('a%s: %s' % (n, theta[n]))
+        txt += " + {:.4f}*x".format(theta[n]) if theta[n] >= 0 else \
+            " - {:.4f}*x".format(-theta[n])
+        if n > 1:
+            txt += "^%s" % str(n)
         y += theta[n] * (x ** (n))
 
-    return x, y
+    return x, y, txt
 
 def linear_regression(x, y):
     x_mean = np.mean(x)
     y_mean = np.mean(y)
-    n = len(x)
-    num = 0
-    den = 0
-    for i in range(n):
-        num += (x[i] - x_mean) * (y[i] - y_mean)
-        den += (x[i] - x_mean) ** 2
 
-    b1 = num/den
-    b0 = y_mean - (b1 * x_mean)
+    num = sum((x_i - x_mean)*(y_i - y_mean) for (x_i, y_i) in zip(x, y))
+    den = sum((x_i - x_mean)**2 for x_i in x)
 
-    print('Linear Regression: y = mx +b')
-    print('m: ', b1)
-    print('b: ', b0)
+    m = num/den
+    c = y_mean - (m * x_mean)
 
-    x_max = np.max(x)
-    x_min = np.min(x)
+    print('Linear Regression: y = mx + c')
+    print('m: ', m)
+    print('c: ', c)
 
-    x = np.linspace(x_min, x_max, 100)
-    y = b0 + b1 * x
-    return x, y
+    x = np.linspace(np.min(x), np.max(x), 100)
+    y = c + m * x
+    return x, y, "y = ({:.4f})*x + ({:.4f})".format(m, c)
+
+def read_csv(filename):
+    with open('dataset.csv') as f:
+        reader = csv.reader(f, skipinitialspace=True, delimiter=',')
+        data = [row for row in reader]
+        data = {k: v for k, v in zip(data[0], np.array(data[1:], dtype=np.float).T)}
+    return data
 
 def regression(types):
-    dataset = pd.read_csv('dataset.csv')
-    x = dataset['x'].values
-    y = dataset['y'].values
+    data = read_csv('dataset.csv')
+    x, y = data['x'], data['y']
 
-    if(types=='linear_regression'):
-        x_lr, y_lr = linear_regression(x, y)
-        plt.plot(x_lr, y_lr, color='#a7de77', label='Linear Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Linear Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='polynomial_regression'):
-        x_poly, y_poly = polynomial_regression(x, y, 3)
-        plt.plot(x_poly, y_poly, color='#a7de77', label='Polynomial Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Polynomial Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='power_regression'):
-        x_pow, y_pow = power_regression(x, y)
-        plt.plot(x_pow, y_pow, color='#a7de77', label='Power Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Power Regression')
-        plt.legend()
-        plt.show()
-    elif(types=='exponential_regression'):
-        x_exp, y_exp = exponential_regression(x, y)
-        plt.plot(x_exp, y_exp, color='#a7de77', label='Exponential Regression')
-        plt.scatter(x, y, color='#9b354c', label='Data Point')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Exponential Regression')
-        plt.legend()
-        plt.show()
-    else:
-        print('Invalid Type of Regression!!')
+    if types not in available_regression:
+        raise RuntimeError("Invalid Regression Type of '%s', available: %s" % (types, 
+                           ", ".join(available_regression)))
+    kwargs = {}
+    if types == 'polynomial_regression':
+        kwargs['degree'] = 3
+    
+    x_reg, y_reg, text = eval(f"{types}(x, y, **kwargs)")
+    
+    label = ' '.join(word.capitalize() for word in types.replace('_', ' ').split())
+    plt.plot(x_reg, y_reg, color='#a7de77', label=label)
+    plt.scatter(x, y, color='#9b354c', label='Data Point')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(label)
+    plt.legend()
+    x_lim = plt.gca().get_xlim()
+    y_lim = plt.gca().get_ylim()
+    x_text = x_lim[0] + ((x_lim[1] - x_lim[0])/64)
+    y_text = y_lim[1] - ((y_lim[1] - y_lim[0])/5)
+    plt.text(x_text, y_text, text)
+    plt.show()
 
 if __name__=='__main__':
-    types = 'linear_regression'
-    if(len(sys.argv)>1):
-        types = str(sys.argv[1]) 
-    regression(types)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('type', nargs='?', default='linear_regression', 
+        help='regression type to be executed')
+    args = parser.parse_args()
+    regression(args.type)
