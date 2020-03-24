@@ -15,6 +15,6 @@ $ python3 regression.py # default linear_regression
 $ python3 regression.py exponential_regression #choose spesific regression type
 ~~~
 
-## Contributor
+## License
 
-* [Resha Dwika Hefni Al-Fahsi](mailto:resha.dwika.hefni.alfahsi@mail.ugm.ac.id) 
+* [MIT License](https://github.com/reshalfahsi/regression/blob/master/LICENSE) 
