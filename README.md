@@ -27,8 +27,14 @@ If you found it useful don't forget to cite:
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/reshalfahsi/regression}},
-  commit = { *fill it  with which version of commit you use e.g. 33a2c2b* }
+  commit = { *fill it with which version of commit you use e.g. 33a2c2b* }
 }
+~~~
+
+or
+
+~~~
+R.D.H. Al-Fahsi, Regression, (2020), GitHub repository, https://github.com/reshalfahsi/regression
 ~~~
 
 ## License

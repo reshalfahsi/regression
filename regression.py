@@ -13,11 +13,22 @@ available_regression = [
 
 def power_regression(x, y):
     n = len(x)
+    correction = 1e-6
     term1 = 0
     term2 = 0
     term3 = 0
     term4 = 0
     
+    result = np.where(x == 0)
+    idx = result[0][0] 
+    if (n > 1):
+        if (idx < n-1): 
+            x[idx] = (x[idx] + x[idx+1])/2.0
+        else:
+            x[idx] = (x[idx] + x[idx-1])/2.0
+    else:
+        x[idx] += correction
+
     for i in range(n):
         term1 += np.log(x[i]) * np.log(y[i])
         term2 += np.log(x[i])
@@ -37,7 +48,7 @@ def power_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a*(x**b)
 
-    return x, y, "y = ({:.4f} * x)^({:.4f})".format(a, b)
+    return x, y, "y = {:.4f} * x^({:.4f})".format(a, b)
 
 def exponential_regression(x, y):
     x_mean = np.mean(x)
@@ -132,14 +143,14 @@ def linear_regression(x, y):
     return x, y, "y = ({:.4f})*x + ({:.4f})".format(m, c)
 
 def read_csv(filename):
-    with open('dataset.csv') as f:
+    with open(filename) as f:
         reader = csv.reader(f, skipinitialspace=True, delimiter=',')
         data = [row for row in reader]
         data = {k: v for k, v in zip(data[0], np.array(data[1:], dtype=np.float).T)}
     return data
 
-def regression(types):
-    data = read_csv('dataset.csv')
+def regression(types, directory):
+    data = read_csv(str(directory))
     x, y = data['x'], data['y']
 
     if types not in available_regression:
@@ -169,5 +180,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('type', nargs='?', default='linear_regression', 
         help='regression type to be executed')
+    parser.add_argument('dir', nargs='?', default='dataset/default.csv', 
+        help='directory to the dataset')
     args = parser.parse_args()
-    regression(args.type)
+    regression(args.type, args.dir)
