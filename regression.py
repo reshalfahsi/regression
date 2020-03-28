@@ -58,7 +58,7 @@ def power_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a*(x**b)
 
-    return x, y, "y = {:.6f} * x^({:.6f})".format(a, b)
+    return x, y, "y = {:.9f} * x^({:.6f})".format(a, b)
 
 def exponential_regression(x, y):
     x_mean = np.mean(x)
@@ -101,7 +101,7 @@ def exponential_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a * np.exp(b*x)
 
-    return x, y, "y = {:.6f} * (e^({:.6f} * x))".format(a, b)
+    return x, y, "y = {:.9f} * (e^({:.6f} * x))".format(a, b)
 
 def polynomial_regression(x, y, degree=3):
     X = np.ones((len(x), degree+1))
