@@ -5,7 +5,6 @@ Regression is a method to form relationship between one dependent variable (usua
 ## Dependencies
 
 * NumPy
-* Pandas
 * Matplotlib
 
 ## How to Use
