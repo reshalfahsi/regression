@@ -20,14 +20,24 @@ def power_regression(x, y):
     term4 = 0
     
     result = np.where(x == 0)
-    idx = result[0][0] 
-    if (n > 1):
-        if (idx < n-1): 
-            x[idx] = (x[idx] + x[idx+1])/2.0
-        else:
-            x[idx] = (x[idx] + x[idx-1])/2.0
-    else:
+    for idx in result[0]: 
+        if (n > 1):
+            if (idx < n-1): 
+                x[idx] = (x[idx] + x[idx+1])/2.0
+            else:
+                x[idx] = (x[idx] + x[idx-1])/2.0
+
         x[idx] += correction
+
+    result = np.where(y == 0)
+    for idx in result[0]: 
+        if (n > 1):
+            if (idx < n-1): 
+                y[idx] = (y[idx] + y[idx+1])/2.0
+            else:
+                y[idx] = (y[idx] + y[idx-1])/2.0
+
+        y[idx] += correction
 
     for i in range(n):
         term1 += np.log(x[i]) * np.log(y[i])
@@ -59,6 +69,18 @@ def exponential_regression(x, y):
     term4 = 0
     term5 = 0
     den = 0
+    correction = 1e-6
+
+    result = np.where(y == 0)
+    for idx in result[0]: 
+        if (n > 1):
+            if (idx < n-1): 
+                y[idx] = (y[idx] + y[idx+1])/2.0
+            else:
+                y[idx] = (y[idx] + y[idx-1])/2.0
+
+        y[idx] += correction
+
     for i in range(n):
         term1 += (x[i]*x[i]*y[i])
         term2 += (y[i]*np.log(y[i]))
