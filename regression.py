@@ -27,7 +27,9 @@ def power_regression(x, y):
         #    else:
         #        x[idx] = (x[idx] + x[idx-1])/2.0
         #
-        x[idx] += correction
+        sign = np.sign(x[idx])
+        if (sign>=0): sign = 1
+        x[idx] += sign * correction
 
     result = np.where(y == 0)
     for idx in result[0]: 
@@ -37,7 +39,9 @@ def power_regression(x, y):
         #    else:
         #        y[idx] = (y[idx] + y[idx-1])/2.0
         #
-        y[idx] += correction
+        sign = np.sign(y[idx])
+        if (sign>=0): sign = 1
+        y[idx] += sign * correction
 
     for i in range(n):
         term1 += np.log(abs(x[i])) * np.log(abs(y[i]))
@@ -79,7 +83,9 @@ def exponential_regression(x, y):
         #    else:
         #        y[idx] = (y[idx] + y[idx-1])/2.0
         #
-        y[idx] += correction
+        sign = np.sign(y[idx])
+        if (sign>=0): sign = 1
+        y[idx] += sign * correction
 
     for i in range(n):
         term1 += (x[i]*x[i]*y[i])
