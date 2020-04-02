@@ -13,7 +13,7 @@ available_regression = [
 
 def power_regression(x, y):
     n = len(x)
-    correction = 1e-6
+    correction = 1e-9
     term1 = 0
     term2 = 0
     term3 = 0
@@ -21,29 +21,29 @@ def power_regression(x, y):
     
     result = np.where(x == 0)
     for idx in result[0]: 
-        if (n > 1):
-            if (idx < n-1): 
-                x[idx] = (x[idx] + x[idx+1])/2.0
-            else:
-                x[idx] = (x[idx] + x[idx-1])/2.0
-
+        #if (n > 1):
+        #    if (idx < n-1): 
+        #        x[idx] = (x[idx] + x[idx+1])/2.0
+        #    else:
+        #        x[idx] = (x[idx] + x[idx-1])/2.0
+        #
         x[idx] += correction
 
     result = np.where(y == 0)
     for idx in result[0]: 
-        if (n > 1):
-            if (idx < n-1): 
-                y[idx] = (y[idx] + y[idx+1])/2.0
-            else:
-                y[idx] = (y[idx] + y[idx-1])/2.0
-
+        #if (n > 1):
+        #    if (idx < n-1): 
+        #        y[idx] = (y[idx] + y[idx+1])/2.0
+        #    else:
+        #        y[idx] = (y[idx] + y[idx-1])/2.0
+        #
         y[idx] += correction
 
     for i in range(n):
-        term1 += np.log(x[i]) * np.log(y[i])
-        term2 += np.log(x[i])
-        term3 += np.log(y[i])
-        term4 += np.log(x[i]) ** 2
+        term1 += np.log(abs(x[i])) * np.log(abs(y[i]))
+        term2 += np.log(abs(x[i]))
+        term3 += np.log(abs(y[i]))
+        term4 += np.log(abs(x[i])) ** 2
 
     b = ((n*term1) - (term2* term3))/((n*term4)-(term2 ** 2))
     a = (term3 - (b*term2))/n
@@ -69,27 +69,27 @@ def exponential_regression(x, y):
     term4 = 0
     term5 = 0
     den = 0
-    correction = 1e-6
+    correction = 1e-9
 
     result = np.where(y == 0)
     for idx in result[0]: 
-        if (n > 1):
-            if (idx < n-1): 
-                y[idx] = (y[idx] + y[idx+1])/2.0
-            else:
-                y[idx] = (y[idx] + y[idx-1])/2.0
-
+        #if (n > 1):
+        #    if (idx < n-1): 
+        #        y[idx] = (y[idx] + y[idx+1])/2.0
+        #    else:
+        #        y[idx] = (y[idx] + y[idx-1])/2.0
+        #
         y[idx] += correction
 
     for i in range(n):
         term1 += (x[i]*x[i]*y[i])
-        term2 += (y[i]*np.log(y[i]))
+        term2 += (y[i]*np.log(abs(y[i])))
         term3 += (x[i]*y[i])
-        term4 += (x[i]*y[i]*np.log(y[i]))
+        term4 += (x[i]*y[i]*np.log(abs(y[i])))
         term5 += y[i]
     a = (term1*term2 - term3*term4)/(term5*term1 - term3*term3)
     a = np.exp(a)
-    b = (term5*term4 - term3*term2)/(term5*term1 - term3*term3)
+    b = ((term5*term4) - term3*term2)/((term5*term1) - term3*term3)
 
     print('Exponential Regression: y = a.e^(bx)')
     print('a: ', a)
