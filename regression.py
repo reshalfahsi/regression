@@ -13,12 +13,23 @@ available_regression = [
 
 def power_regression(x, y):
     n = len(x)
-    correction = 1e-9
+    x_correction = 1 #1e-6
+    y_correction = 1 #1e-6
     term1 = 0
     term2 = 0
     term3 = 0
     term4 = 0
-    
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+
+    #if (x_mean != 0):
+    #    power = np.log(x_mean)/np.log(10)
+    #    x_correction *= pow(10, power)
+
+    #if (y_mean != 0):
+    #    power = np.log(y_mean)/np.log(10)
+    #    y_correction *= pow(10, power)
+
     result = np.where(x == 0)
     for idx in result[0]: 
         #if (n > 1):
@@ -29,7 +40,7 @@ def power_regression(x, y):
         #
         sign = np.sign(x[idx])
         if (sign>=0): sign = 1
-        x[idx] += sign * correction
+        x[idx] += sign * x_correction
 
     result = np.where(y == 0)
     for idx in result[0]: 
@@ -41,7 +52,7 @@ def power_regression(x, y):
         #
         sign = np.sign(y[idx])
         if (sign>=0): sign = 1
-        y[idx] += sign * correction
+        y[idx] += sign * y_correction
 
     for i in range(n):
         term1 += np.log(abs(x[i])) * np.log(abs(y[i]))
@@ -73,7 +84,11 @@ def exponential_regression(x, y):
     term4 = 0
     term5 = 0
     den = 0
-    correction = 1e-9
+    correction = 1 #1e-6
+    #mean = np.mean(y)
+    #if (mean != 0):
+    #    power = np.log(mean)/np.log(10)
+    #    correction *= pow(10, power)
 
     result = np.where(y == 0)
     for idx in result[0]: 
