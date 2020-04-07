@@ -192,8 +192,9 @@ def read_csv(filename):
         data = {k: v for k, v in zip(data[0], np.array(data[1:], dtype=np.float).T)}
     return data
 
-def regression(types, directory):
-    data = read_csv(str(directory))
+def regression(args):
+    types = args.type + '_regression' if 'regression' not in args.type else args.type
+    data = read_csv(str(args.dataset))
     x, y = data['x'], data['y']
 
     if types not in available_regression:
@@ -201,8 +202,8 @@ def regression(types, directory):
                            ", ".join(available_regression)))
     kwargs = {}
     if types == 'polynomial_regression':
-        kwargs['degree'] = 3
-    
+        kwargs['degree'] = args.degree
+
     x_reg, y_reg, text = eval(f"{types}(x, y, **kwargs)")
     
     label = ' '.join(word.capitalize() for word in types.replace('_', ' ').split())
@@ -220,10 +221,13 @@ def regression(types, directory):
     plt.show()
 
 if __name__=='__main__':
+    regression_types = [reg.replace('_regression', '') for reg in available_regression]
     parser = argparse.ArgumentParser()
-    parser.add_argument('type', nargs='?', default='linear_regression', 
-        help='regression type to be executed')
-    parser.add_argument('dir', nargs='?', default='dataset/default.csv', 
-        help='directory to the dataset')
+    parser.add_argument('type', nargs='?', default='linear', 
+        help='regression type to be executed', choices=regression_types)
+    parser.add_argument('-d', '--dataset', default='dataset/default.csv', 
+        help='dataset path')
+    parser.add_argument('--degree', default=3, type=int,
+        help='degree of polynomial regression')
     args = parser.parse_args()
-    regression(args.type, args.dir)
+    regression(args)
