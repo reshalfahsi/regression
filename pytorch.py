@@ -11,6 +11,10 @@ class PolyRegression(nn.Module):
     for example, degree of 1 is the model for linear regression `y = a*x + b`,
     degree of 2 is the model for quadratic regression `y = a*(x^2) + b*x + c`, etc.
 
+    keep in mind to always normalise, with interval of (0, 1], the data (`x` variable)
+    you input to the model, if you don't want to cause a gradient explosion because 
+    the output value is too big to handle.
+
     Args:
         degree (int): the degree of polynomial regression
 
