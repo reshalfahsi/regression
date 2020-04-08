@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import argparse
+from pytorch import compute_r2
 
 available_regression = [
     'power_regression',
@@ -64,9 +65,13 @@ def power_regression(x, y):
     a = (term3 - (b*term2))/n
     a = np.exp(a)
 
+    yreg = a*(x**b)
+    r2 = compute_r2(y, yreg)
+
     print('Power Regression: y = a.x^(b)')
     print('a: ', a)
     print('b: ', b)
+    print('R2: ', r2)
 
     x_max = np.max(x)
     x_min = np.min(x)
@@ -112,9 +117,13 @@ def exponential_regression(x, y):
     a = np.exp(a)
     b = ((term5*term4) - term3*term2)/((term5*term1) - term3*term3)
 
+    yreg = a * np.exp(b*x)
+    r2 = compute_r2(y, yreg)
+
     print('Exponential Regression: y = a.e^(bx)')
     print('a: ', a)
     print('b: ', b)
+    print('R2: ', r2)
 
     x_max = np.max(x)
     x_min = np.min(x)
@@ -122,7 +131,7 @@ def exponential_regression(x, y):
     x = np.linspace(x_min, x_max, 100)
     y = a * np.exp(b*x)
 
-    return x, y, "y = {:.9f} * (e^({:.6f} * x))".format(a, b)
+    return x, y, r2, "y = {:.9f} * (e^({:.6f} * x))".format(a, b)
 
 def polynomial_regression(x, y, degree=3):
     X = np.ones((len(x), degree+1))
@@ -132,6 +141,7 @@ def polynomial_regression(x, y, degree=3):
 
     m = len(x)
     theta = np.zeros(degree+1)
+    yorig = np.array(y)
 
     h = theta[0]
     for n in np.arange(1, len(theta)):
@@ -153,6 +163,7 @@ def polynomial_regression(x, y, degree=3):
 
     x = np.linspace(np.min(x), np.max(x), 100)
     y = theta[0]
+    yreg = theta[0]
     txt = "y = {:.4f}".format(theta[0])
 
     print('Polynomial Regression: a0 + a1.X + ... + an.X^n') 
@@ -164,8 +175,10 @@ def polynomial_regression(x, y, degree=3):
         if n > 1:
             txt += "^%s" % str(n)
         y += theta[n] * (x ** (n))
-
-    return x, y, txt
+        yreg += theta[n] * (x**n)
+    r2 = compute_r2(yorig, yreg)
+    print('R2: ', r2)
+    return x, y, r2, txt
 
 def linear_regression(x, y):
     x_mean = np.mean(x)
@@ -177,13 +190,17 @@ def linear_regression(x, y):
     m = num/den
     c = y_mean - (m * x_mean)
 
+    yreg = m*x + c
+    r2 = compute_r2(y, yreg)
+
     print('Linear Regression: y = mx + c')
     print('m: ', m)
     print('c: ', c)
+    print('R2: ', r2)
 
     x = np.linspace(np.min(x), np.max(x), 100)
     y = c + m * x
-    return x, y, "y = ({:.4f})*x + ({:.4f})".format(m, c)
+    return x, y, r2, "y = ({:.4f})*x + ({:.4f})".format(m, c)
 
 def read_csv(filename):
     with open(filename) as f:
@@ -204,7 +221,7 @@ def regression(args):
     if types == 'polynomial_regression':
         kwargs['degree'] = args.degree
 
-    x_reg, y_reg, text = eval(f"{types}(x, y, **kwargs)")
+    x_reg, y_reg, r2, text = eval(f"{types}(x, y, **kwargs)")
     
     label = ' '.join(word.capitalize() for word in types.replace('_', ' ').split())
     plt.plot(x_reg, y_reg, color='#a7de77', label=label)
@@ -218,6 +235,8 @@ def regression(args):
     x_text = x_lim[0] + ((x_lim[1] - x_lim[0])/64)
     y_text = y_lim[1] - ((y_lim[1] - y_lim[0])/5)
     plt.text(x_text, y_text, text)
+    r2_txt = "R2: {:.4}".format(r2)
+    plt.text(x_text, y_text-((y_lim[1] - y_lim[0])/15), r2_txt)
     plt.show()
 
 if __name__=='__main__':
