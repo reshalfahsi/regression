@@ -6,6 +6,7 @@ Regression is a method to form relationship between one dependent variable (usua
 
 * NumPy
 * Matplotlib
+* PyTorch
 
 ## How to Use
 
